@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fertilizer Recommendation</title>
+    <style>
+        :root {
+            --primary: #2e7d32;
+            --primary-light: #60ad5e;
+            --primary-dark: #005005;
+            --accent: #8bc34a;
+            --text: #333;
+            --text-light: #666;
+            --background: rgba(255, 255, 255, 0.9);
+            --card: #ffffff;
+            --border-radius: 8px;
+            --shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: var(--text);
+    line-height: 1.6;
+    padding: 20px;
+    min-height: 100vh;
+    position: relative;
+    background: none;
+}
+        
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('https://images.unsplash.com/photo-1500382017468-9049fed747ef');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    filter: brightness(0.8);
+    z-index: -1;
+}
+        
+        .container {
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 30px;
+            background: var(--card);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            position: relative;
+            backdrop-filter: blur(5px);
+        }
+        
+        h2 {
+            color: var(--primary-dark);
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        .form-group {
+            margin-bottom: 16px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: var(--text-light);
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            transition: var(--transition);
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(46, 125, 50, 0.2);
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        
+        .form-col {
+            flex: 1;
+        }
+        
+        button {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-top: 10px;
+        }
+        
+        button:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        .result {
+            margin-top: 24px;
+            padding: 16px;
+            background: #e8f5e9;
+            border-radius: var(--border-radius);
+            font-size: 18px;
+            color: var(--primary-dark);
+            text-align: center;
+            display: none;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .result.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+        
+        .section-title {
+            margin: 24px 0 12px;
+            color: var(--primary);
+            font-size: 18px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 8px;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top: 4px solid var(--primary);
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        .page-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('/api/placeholder/1920/1080');
+            background-size: cover;
+            background-position: center;
+            filter: brightness(0.8);
+            z-index: -1;
+        }
+        
+        .app-header {
+            text-align: center;
+            margin-bottom: 10px;
+            color: white;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.6);
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+                margin: 20px auto;
+            }
+            
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-background"></div>
+    
+    <div class="app-header">
+        <h1>Smart Agriculture Solutions</h1>
+    </div>
+    
+    <div class="container">
+        <h2>Fertilizer Recommendation System</h2>
+        
+        <form id="fertilizerForm">
+            <div class="section-title">Soil Nutrients</div>
+            <div class="form-row">
+                <div class="form-col">
+                    <div class="form-group">
+                        <label for="N">Nitrogen (N)</label>
+                        <input type="number" id="N" name="N" placeholder="Enter value" required>
+                    </div>
+                </div>
+                <div class="form-col">
+                    <div class="form-group">
+                        <label for="P">Phosphorus (P)</label>
+                        <input type="number" id="P" name="P" placeholder="Enter value" required>
+                    </div>
+                </div>
+                <div class="form-col">
+                    <div class="form-group">
+                        <label for="K">Potassium (K)</label>
+                        <input type="number" id="K" name="K" placeholder="Enter value" required>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section-title">Environmental Conditions</div>
+            <div class="form-row">
+                <div class="form-col">
+                    <div class="form-group">
+                        <label for="temperature">Temperature (°C)</label>
+                        <input type="number" id="temperature" name="temperature" placeholder="Enter temperature" required>
+                    </div>
+                </div>
+                <div class="form-col">
+                    <div class="form-group">
+                        <label for="humidity">Humidity (%)</label>
+                        <input type="number" id="humidity" name="humidity" placeholder="Enter humidity" required>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="moisture">Soil Moisture (%)</label>
+                <input type="number" id="moisture" name="moisture" placeholder="Enter soil moisture" required>
+            </div>
+            
+            <div class="section-title">Soil & Crop Information</div>
+            <div class="form-row">
+                <div class="form-col">
+                    <div class="form-group">
+                        <label for="soil_type">Soil Type</label>
+                        <select id="soil_type" name="soil_type" required>
+                            <option value="" disabled selected>Select Soil Type</option>
+                            <option value="0">Clayey</option>
+                            <option value="1">Sandy</option>
+                            <option value="2">Loamy</option>
+                            <option value="3">Black</option>
+                            <option value="4">Red</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-col">
+                    <div class="form-group">
+                        <label for="crop_type">Crop Type</label>
+                        <select id="crop_type" name="crop_type" required>
+                            <option value="" disabled selected>Select Crop Type</option>
+                            <option value="0">Wheat</option>
+                            <option value="1">Rice</option>
+                            <option value="2">Maize</option>
+                            <option value="3">Sugarcane</option>
+                            <option value="4">Cotton</option>
+                            <option value="5">Barley</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <button type="submit">Get Fertilizer Recommendation</button>
+        </form>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Analyzing soil data...</p>
+        </div>
+        
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        // Use a placeholder background image from the API
+        document.querySelector('.page-background').style.backgroundImage = "url('/api/placeholder/1920/1080')";
+        
+        document.getElementById('fertilizerForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            
+            // Show loading indicator
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('result').style.display = 'none';
+            
+            const formData = new FormData(this);
+            const data = {};
+            formData.forEach((value, key) => data[key] = parseFloat(value));
+
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+                
+                // Hide loading and show result
+                document.getElementById('loading').style.display = 'none';
+                const resultElement = document.getElementById('result');
+                resultElement.innerText = 'Recommended Fertilizer: ' + result.recommended_fertilizer;
+                resultElement.classList.add('active');
+                resultElement.style.display = 'block';
+            } catch (error) {
+                // Handle errors
+                document.getElementById('loading').style.display = 'none';
+                const resultElement = document.getElementById('result');
+                resultElement.innerText = 'Error: Could not get recommendation. Please try again.';
+                resultElement.style.display = 'block';
+                resultElement.style.background = '#ffebee';
+                resultElement.style.borderLeft = '4px solid #d32f2f';
+            }
+        });
+    </script>
+</body>
+</html>
