@@ -208,14 +208,20 @@ body::before {
     </style>
 </head>
 <body>
+    
     <div class="page-background"></div>
+    
     
     <div class="app-header">
         <h1>Smart Agriculture Solutions</h1>
+        
     </div>
+   
     
     <div class="container">
         <h2>Fertilizer Recommendation System</h2>
+        <h4>Select Language</h4>
+        <div id="google_translate_element"></div>
         
         <form id="fertilizerForm">
             <div class="section-title">Soil Nutrients</div>
@@ -344,5 +350,17 @@ body::before {
             }
         });
     </script>
+
+<script src="script.js"></script>
+      <script type="text/javascript">
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement(
+                {pageLanguage: 'en'},
+                'google_translate_element'
+            );
+        } 
+  </script>
+  <script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
 </body>
 </html>
